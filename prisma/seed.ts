@@ -4,7 +4,15 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Updating IRON REVOLUTION Database with Real Naroli Gym Information...');
+  console.log('🌱 Checking IRON REVOLUTION Database Initialization...');
+
+  const userCount = await prisma.user.count().catch(() => 0);
+  if (userCount > 0) {
+    console.log('✅ Database already initialized with data. Skipping re-seed.');
+    return;
+  }
+
+  console.log('🌱 Populating IRON REVOLUTION Database with Real Naroli Gym Information...');
 
   // Clean tables
   await prisma.attendance.deleteMany();
