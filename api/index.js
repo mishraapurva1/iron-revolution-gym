@@ -33277,6 +33277,8 @@ var app_default = app;
 function handler(req, res) {
   return app_default(req, res);
 }
+module.exports = handler;
+module.exports.default = handler;
 /*! Bundled license information:
 
 depd/index.js:
