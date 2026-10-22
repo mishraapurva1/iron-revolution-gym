@@ -4,73 +4,48 @@ setlocal enabledelayedexpansion
 echo ==============================================================
 echo      IRON REVOLUTION 2.0 - GITHUB UPLOAD HELPER
 echo ==============================================================
+echo Repository: https://github.com/mishraapurva1/iron-revolution-gym.git
 echo.
 
-where git >nul 2>nul
-if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Git is not detected in your PATH.
-    echo If you just installed Git, please close and reopen this terminal window,
-    echo or download Git from: https://git-scm.com/download/win
-    echo.
-    pause
-    exit /b 1
-)
+:: Ensure Git is in PATH
+set "PATH=%LOCALAPPDATA%\Programs\Git\cmd;%PATH%"
 
-echo [1/4] Checking Git repository initialization...
-if not exist ".git" (
-    echo Initializing local git repository on branch main...
-    git init -b main
-) else (
-    echo Local git repository already exists.
-    git branch -M main
-)
+echo [1/3] Checking Git status...
+git branch -M main
 
-echo.
-echo [2/4] Staging project files...
+echo [2/3] Verifying commit...
 git add .
+git commit -m "Initial commit: IRON REVOLUTION 2.0 Web-Based Gym Management System by Apurva Mishra" 2>nul
+
+echo [3/3] Setting remote origin...
+git remote set-url origin https://github.com/mishraapurva1/iron-revolution-gym.git 2>nul || git remote add origin https://github.com/mishraapurva1/iron-revolution-gym.git
 
 echo.
-echo [3/4] Creating commit...
-git commit -m "Initial commit: IRON REVOLUTION 2.0 Web-Based Gym Management System by Apurva Mishra"
-
+echo ==============================================================
+echo Pushing your files to GitHub...
+echo (A browser window or GitHub sign-in prompt will appear if you
+echo are not already signed in. Please click 'Sign in' to allow)
+echo ==============================================================
 echo.
-echo [4/4] Remote repository connection...
-set "CURRENT_ORIGIN="
-for /f "tokens=*" %%a in ('git remote get-url origin 2^>nul') do set "CURRENT_ORIGIN=%%a"
 
-if defined CURRENT_ORIGIN (
-    echo Current remote origin: %CURRENT_ORIGIN%
-    set /p "CHANGE_ORIGIN=Do you want to change this GitHub URL? (y/N): "
-    if /i "!CHANGE_ORIGIN!"=="y" (
-        set /p "REPO_URL=Enter your GitHub repository URL (e.g. https://github.com/username/repo.git): "
-        git remote set-url origin !REPO_URL!
-    )
-) else (
-    echo Please create an empty repository on https://github.com/new first.
-    echo (Do NOT initialize it with README, .gitignore, or license)
-    echo.
-    set /p "REPO_URL=Enter your GitHub repository URL: "
-    git remote add origin !REPO_URL!
-)
-
-echo.
-echo Pushing to GitHub (main branch)...
-echo If prompted, authenticate in the browser or enter your GitHub Personal Access Token.
-echo.
 git push -u origin main
 
 if %ERRORLEVEL% EQU 0 (
     echo.
     echo ==============================================================
-    echo [SUCCESS] Your project has been uploaded to GitHub successfully!
+    echo [SUCCESS] IRON REVOLUTION 2.0 uploaded to GitHub successfully!
+    echo View it at: https://github.com/mishraapurva1/iron-revolution-gym
     echo ==============================================================
 ) else (
     echo.
     echo ==============================================================
-    echo [NOTICE] If the push failed due to authentication:
-    echo 1. Ensure your GitHub repo URL is correct.
-    echo 2. If GitHub asks for a password, use a Personal Access Token:
-    echo    GitHub -> Settings -> Developer Settings -> Personal Access Tokens (Tokens classic).
+    echo [PUSH NOTICE]
+    echo If the push failed with an authentication or permission error:
+    echo 1. Make sure you are signed into your GitHub account: mishraapurva1
+    echo 2. If prompted for password, GitHub requires a Personal Access Token:
+    echo    - Open https://github.com/settings/tokens
+    echo    - Generate new token (classic) with 'repo' scope
+    echo    - Use your token as the password
     echo ==============================================================
 )
 
