@@ -38,6 +38,14 @@ const authLimiter = rateLimit({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Normalize /api prefix for Vercel Serverless Function rewrites
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (!req.url.startsWith('/api')) {
+    req.url = '/api' + req.url;
+  }
+  next();
+});
+
 // Health Check
 app.get('/api/health', (req: Request, res: Response) => {
   res.status(200).json({
