@@ -1,0 +1,213 @@
+// Prisma Schema for IRON REVOLUTION Gym Management System
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String          @id @default(uuid())
+  email        String          @unique
+  passwordHash String
+  role         String          @default("MEMBER") // ADMIN, TRAINER, MEMBER
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  memberProfile  MemberProfile?
+  trainerProfile TrainerProfile?
+}
+
+model MemberProfile {
+  id                   String            @id @default(uuid())
+  userId               String            @unique
+  user                 User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  memberId             String            @unique // e.g. IR-MEM-1001
+  fullName             String
+  phone                String
+  dateOfBirth          String?
+  gender               String?           // Male, Female, Other
+  address              String?
+  emergencyContact     String?
+  status               String            @default("PENDING") // ACTIVE, INACTIVE, PENDING, EXPIRED
+  
+  assignedTrainerId    String?
+  assignedTrainer      TrainerProfile?   @relation("TrainerMembers", fields: [assignedTrainerId], references: [id])
+  
+  membershipPlanId     String?
+  membershipPlan       MembershipPlan?   @relation(fields: [membershipPlanId], references: [id])
+  
+  membershipStartDate  DateTime?
+  membershipExpiryDate DateTime?
+
+  attendances          Attendance[]
+  payments             Payment[]
+  workoutPlans         WorkoutPlan[]
+  memberships          Membership[]
+
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+}
+
+model TrainerProfile {
+  id              String          @id @default(uuid())
+  userId          String          @unique
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trainerId       String          @unique // e.g. IR-TRN-1001
+  fullName        String
+  phone           String
+  specialization  String          // e.g. Bodybuilding & Strength, Crossfit, HIIT
+  experienceYears Int             @default(1)
+  bio             String?
+  photoUrl        String?
+  status          String          @default("ACTIVE") // ACTIVE, INACTIVE
+
+  assignedMembers MemberProfile[] @relation("TrainerMembers")
+  workoutClasses  WorkoutClass[]
+  workoutPlans    WorkoutPlan[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model MembershipPlan {
+  id             String          @id @default(uuid())
+  name           String          @unique // Monthly, Quarterly, Half-Yearly, Annual
+  description    String
+  durationMonths Int             // 1, 3, 6, 12
+  price          Float
+  benefits       String          // Comma or JSON-separated list of benefits
+  isActive       Boolean         @default(true)
+
+  members        MemberProfile[]
+  memberships    Membership[]
+  payments       Payment[]
+
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Membership {
+  id              String        @id @default(uuid())
+  memberProfileId String
+  memberProfile   MemberProfile @relation(fields: [memberProfileId], references: [id], onDelete: Cascade)
+  membershipPlanId String
+  membershipPlan  MembershipPlan @relation(fields: [membershipPlanId], references: [id])
+  startDate       DateTime
+  endDate         DateTime
+  amountPaid      Float
+  status          String        @default("ACTIVE") // ACTIVE, EXPIRED, CANCELLED
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Attendance {
+  id              String        @id @default(uuid())
+  memberProfileId String
+  memberProfile   MemberProfile @relation(fields: [memberProfileId], references: [id], onDelete: Cascade)
+  date            String        // YYYY-MM-DD
+  checkInTime     String?       // e.g. 06:45 AM
+  status          String        @default("PRESENT") // PRESENT, ABSENT
+  notes           String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@unique([memberProfileId, date]) // Prevent duplicate attendance for same member on same date
+}
+
+model WorkoutClass {
+  id               String          @id @default(uuid())
+  title            String          // e.g. Heavy Duty Strength, HIIT Blast, Functional CrossFit
+  trainerProfileId String?
+  trainerProfile   TrainerProfile? @relation(fields: [trainerProfileId], references: [id], onDelete: SetNull)
+  dayOfWeek        String          // Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
+  startTime        String          // 06:00 AM
+  endTime          String          // 07:00 AM
+  maxSlots         Int             @default(20)
+  description      String?
+  roomOrArea       String          @default("Main Fitness Floor")
+
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+model WorkoutPlan {
+  id               String            @id @default(uuid())
+  title            String            // e.g. Hypertrophy Split, Fat Loss & Conditioning
+  memberProfileId  String
+  memberProfile    MemberProfile     @relation(fields: [memberProfileId], references: [id], onDelete: Cascade)
+  trainerProfileId String?
+  trainerProfile   TrainerProfile?   @relation(fields: [trainerProfileId], references: [id], onDelete: SetNull)
+  notes            String?
+
+  exercises        WorkoutExercise[]
+
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model WorkoutExercise {
+  id            String      @id @default(uuid())
+  workoutPlanId String
+  workoutPlan   WorkoutPlan @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
+  exerciseName  String      // e.g. Barbell Squats, Incline Dumbbell Press
+  dayOfWeek     String      // Monday, Tuesday, etc.
+  targetMuscle  String      // Legs, Chest, Back, Shoulders, Arms, Core
+  sets          Int         @default(3)
+  reps          String      // e.g. 8-12, 15
+  weight        String?     // e.g. 60 kg, Bodyweight
+  restSeconds   Int         @default(60)
+  order         Int         @default(1)
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Payment {
+  id               String         @id @default(uuid())
+  receiptNo        String         @unique // e.g. REC-2026-0001
+  memberProfileId  String
+  memberProfile    MemberProfile  @relation(fields: [memberProfileId], references: [id], onDelete: Cascade)
+  membershipPlanId String?
+  membershipPlan   MembershipPlan? @relation(fields: [membershipPlanId], references: [id])
+  amount           Float
+  paymentMethod    String         @default("UPI") // CASH, UPI, CARD, BANK_TRANSFER
+  paymentDate      DateTime       @default(now())
+  status           String         @default("PAID") // PAID, PARTIAL, PENDING
+  notes            String?
+  recordedBy       String?
+
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+model Notice {
+  id          String   @id @default(uuid())
+  title       String
+  content     String
+  priority    String   @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  targetRole  String   @default("ALL")    // ALL, MEMBER, TRAINER
+  isPublished Boolean  @default(true)
+  publishedAt DateTime @default(now())
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GymSetting {
+  id              String   @id @default("default-gym-settings")
+  gymName         String   @default("IRON REVOLUTION")
+  ownerName       String   @default("Sachin Patel")
+  developerName   String   @default("Apurva Mishra")
+  locationAddress String   @default("Naroli, Silvassa, Dadra and Nagar Haveli, India — 396235")
+  phone           String   @default("+91 98765 43210 (Demo)")
+  email           String   @default("info@ironrevolution.demo")
+  openingHours    String   @default("Mon-Sat: 5:30 AM - 10:00 PM | Sun: 6:00 AM - 1:00 PM")
+  announcement    String?  @default("Welcome to IRON REVOLUTION! Experience elite training and state-of-the-art facilities.")
+  
+  updatedAt       DateTime @updatedAt
+}

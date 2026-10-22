@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #050505;
+    color: #F3F4F6;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'Bebas Neue', 'Oswald', sans-serif;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .font-heading {
+    font-family: 'Oswald', sans-serif;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #080808;
+}
+::-webkit-scrollbar-thumb {
+  background: #222222;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #FF1E27;
+}
+
+/* Luxury Glassmorphic Cards */
+.glass-card {
+  background: rgba(18, 18, 18, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 30, 39, 0.35);
+  box-shadow: 0 20px 40px -10px rgba(255, 30, 39, 0.15);
+  transform: translateY(-2px);
+}
+
+.glass-panel {
+  background: rgba(15, 15, 15, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Red Neon Accents & Gradients */
+.glow-red {
+  box-shadow: 0 0 35px -5px rgba(255, 30, 39, 0.45);
+}
+
+.glow-red-sm {
+  box-shadow: 0 0 15px rgba(255, 30, 39, 0.35);
+}
+
+.text-gradient-red {
+  background: linear-gradient(135deg, #FFFFFF 30%, #FF1E27 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-crimson {
+  background: linear-gradient(135deg, #FF3B44 0%, #B80009 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Luxury Button Styles */
+.btn-primary {
+  background: linear-gradient(135deg, #FF1E27 0%, #B80009 100%);
+  color: #FFFFFF;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 20px rgba(255, 30, 39, 0.35);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #FF3840 0%, #D6000B 100%);
+  box-shadow: 0 6px 30px rgba(255, 30, 39, 0.55);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Subtle background ambient light */
+.ambient-glow {
+  background: radial-gradient(circle at 50% 0%, rgba(255, 30, 39, 0.15) 0%, transparent 60%);
+}
+
+.ambient-glow-bottom {
+  background: radial-gradient(circle at 50% 100%, rgba(255, 30, 39, 0.1) 0%, transparent 50%);
+}
+
+/* Print CSS */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
